@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp" tools:context=".Menu"
+    android:background="@drawable/zeus"
+    android:id="@+id/Main">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Options"
+        android:onClick="startOptions"
+        android:id="@+id/button2"
+        android:background="#ff8298ff"/>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="47dp"
+        android:text="PLAY"
+        android:id="@+id/button"
+        android:onClick="startGame"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="false"
+        android:background="#ff8298ff"
+        android:layout_gravity="bottom"
+        android:ellipsize="none"
+        android:textSize="30dp" />
+
+</LinearLayout>
