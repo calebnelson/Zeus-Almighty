@@ -26,7 +26,7 @@ public class Lightning {
 
     public Lightning(GameView gameView, Bitmap bmp) {
         this.gameView = gameView;
-        this.bmp = getResizedBitmap(bmp, 600, 120);
+        this.bmp = getResizedBitmap(bmp, 600, 90);
         x = 0;
         y = 300;
     }

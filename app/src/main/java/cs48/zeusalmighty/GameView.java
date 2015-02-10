@@ -1,6 +1,7 @@
 package cs48.zeusalmighty;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -26,9 +28,11 @@ public class GameView extends SurfaceView {
     private Main activity;
     private Paint paint;
     private int highScore, currentScore;
+    private int spritesAdded, spritesDeleted;
     private int positionCounter = 1000;
     //the lower the number, the harder it is. must be between 0 and 1
-    public double difficultyDecider = 0.95;
+    private SharedPreferences preferences;
+    public double difficultyDecider;
     private double timeTracker = 15000;
     private int speed = 20;
     private double startTime = System.currentTimeMillis();
@@ -41,6 +45,8 @@ public class GameView extends SurfaceView {
         paint.setColor(Color.BLUE);
         paint.setTextSize(100);
         highScore = activity.getHighScore();
+        preferences = activity.getSharedPreferences("Options", Context.MODE_PRIVATE);
+        difficultyDecider = preferences.getFloat("Difficulty", .9f);
         gameLoopThread = new GameThread(this);
         holder = getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -100,11 +106,13 @@ public class GameView extends SurfaceView {
         float temp = random.nextFloat();
         systemTime = System.currentTimeMillis();
         if(peasant.isEmpty()) {
-            peasant.add(createPeasant(R.drawable.good1));
+            peasant.add(createPeasant(R.drawable.test1));
+            spritesAdded++;
         }
 
         else if(temp > difficultyDecider) {
-            peasant.add(createPeasant(R.drawable.good1));
+            peasant.add(createPeasant(R.drawable.test1));
+            spritesAdded++;
         }
 
         if((systemTime - startTime) / timeTracker > 1) {
@@ -134,23 +142,27 @@ public class GameView extends SurfaceView {
         background.onDraw(canvas);
         if (lightning.isVisible())
             lightning.onDraw(canvas);
-        addPeasant(peasants);
         synchronized (getHolder()) {
-            for (Peasant peasant : peasants) {
-                if (peasant.getX() < -20) {
+            addPeasant(peasants);
+            Iterator<Peasant> it = peasants.iterator();
+            while (it.hasNext()) {
+                Peasant peasant = it.next();
+                if (peasant.getX() == 0) {
                     //if peasant is off screen then don't render anymore
-                    peasants.remove(peasant);
+                    spritesDeleted++;
+                    it.remove();
                     peasant.bmp.recycle();
                     peasant.bmp = null;
                     peasant = null;
-                } else if (peasant.getX() >= 0) {
+                    //break;
+                } else if (peasant.getX() > 0) {
                     peasant.onDraw(canvas);
                 }
             }
         }
         currentScore = activity.getCurrentScore();
         highScore = activity.getHighScore();
-        canvas.drawText(String.valueOf(currentScore)+"\nHigh: "+String.valueOf(highScore), 25, 90, paint);
+        canvas.drawText(String.valueOf(currentScore)+" High Score: "+String.valueOf(highScore), 25, 90, paint);
     }
 
     @Override
@@ -161,17 +173,19 @@ public class GameView extends SurfaceView {
                 if (event.getX() > 1800)
                     activity.saveScore();
                 if (event.getY() < 300) {
-                    lightning.setX(event.getX() - 60);
+                    lightning.setX(event.getX() - 45);
                     lightning.setVisible(500, activity);
                 }
-                for (Peasant peasant : peasants) {
+                Iterator<Peasant> it = peasants.iterator();
+                while (it.hasNext()) {
+                    Peasant peasant = it.next();
                     if (peasant.isCollition(event.getX(), event.getY())) {
-                        peasants.remove(peasant);
+                        activity.increaseScore();
+                        spritesDeleted++;
+                        it.remove();
                         peasant.bmp.recycle();
                         peasant.bmp = null;
                         peasant = null;
-                        activity.increaseScore();
-                        break;
                     }
                 }
             }

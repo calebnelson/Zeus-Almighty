@@ -70,6 +70,6 @@ public class Peasant {
     }
 
     public boolean isCollition(float x2, float y2) {
-        return x2 > (x - 100) && x2 < (x + 100 + width) && y2 < 300;
+        return x2 > (x - 25) && x2 < (x + 25 + width) && y2 < 300;
     }
 }
