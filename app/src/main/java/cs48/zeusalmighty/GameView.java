@@ -26,6 +26,7 @@ public class GameView extends SurfaceView {
     private long lastClick;
     private Background background;
     private Main activity;
+    private HealthBar healthBar;
     private Paint paint;
     private int highScore, currentScore;
     private int spritesAdded, spritesDeleted;
@@ -68,6 +69,7 @@ public class GameView extends SurfaceView {
             public void surfaceCreated(SurfaceHolder holder) {
                 createBackground();
                 createLightning();
+                createHealthBar();
                 gameLoopThread.setRunning(true);
                 gameLoopThread.start();
             }
@@ -99,6 +101,11 @@ public class GameView extends SurfaceView {
     private void createLightning() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.lightningbmp);
         lightning = new Lightning(this, bg);
+    }
+
+    private void createHealthBar() {
+        Bitmap hb = BitmapFactory.decodeResource(getResources(), R.drawable.healthbar);
+        healthBar = new HealthBar(this, hb);
     }
 
     public void addPeasant(List<Peasant> peasant) {
@@ -140,8 +147,11 @@ public class GameView extends SurfaceView {
     protected void onDraw(Canvas canvas) {
         canvas.drawColor(Color.WHITE);
         background.onDraw(canvas);
+        //healthBar.onDraw(canvas);
         if (lightning.isVisible())
             lightning.onDraw(canvas);
+        currentScore = activity.getCurrentScore();
+        highScore = activity.getHighScore();
         synchronized (getHolder()) {
             addPeasant(peasants);
             Iterator<Peasant> it = peasants.iterator();
@@ -150,6 +160,10 @@ public class GameView extends SurfaceView {
                 if (peasant.getX() == 0) {
                     //if peasant is off screen then don't render anymore
                     spritesDeleted++;
+                    //if (healthBar.takeHit() == false) {
+                    //    activity.saveScore();
+                    //    activity.finish();
+                    //}
                     it.remove();
                     peasant.bmp.recycle();
                     peasant.bmp = null;
@@ -160,21 +174,19 @@ public class GameView extends SurfaceView {
                 }
             }
         }
-        currentScore = activity.getCurrentScore();
-        highScore = activity.getHighScore();
         canvas.drawText(String.valueOf(currentScore)+" High Score: "+String.valueOf(highScore), 25, 90, paint);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (System.currentTimeMillis() - lastClick > 1000) {
+        if (System.currentTimeMillis() - lastClick > 100) {
             lastClick = System.currentTimeMillis();
             synchronized (getHolder()) {
                 if (event.getX() > 1800)
                     activity.saveScore();
                 if (event.getY() < 300) {
                     lightning.setX(event.getX() - 45);
-                    lightning.setVisible(500, activity);
+                    lightning.setVisible(250, activity);
                 }
                 Iterator<Peasant> it = peasants.iterator();
                 while (it.hasNext()) {

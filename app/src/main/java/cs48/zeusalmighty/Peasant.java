@@ -24,7 +24,7 @@ public class Peasant {
 
     public Peasant(GameView gameView, Bitmap bmp) {
         this.x = gameView.getWidth();
-        this.y = gameView.getHeight() - 260;
+        this.y = gameView.getHeight() - 120;
         this.gameView = gameView;
         this.bmp = bmp;
         this.width = bmp.getWidth() / BMP_COLUMNS;
