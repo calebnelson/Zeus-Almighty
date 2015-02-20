@@ -29,7 +29,9 @@ public class GameView extends SurfaceView {
     private HealthBar healthBar;
     private Paint paint;
     private int highScore, currentScore;
-    private int spritesAdded, spritesDeleted;
+    private int spritesAdded = 0;
+    private int spritesDeleted = 0;
+    private int spritesThatMadeIt = 0;
     private int positionCounter = 1000;
     //the lower the number, the harder it is. must be between 0 and 1
     private SharedPreferences preferences;
@@ -39,15 +41,18 @@ public class GameView extends SurfaceView {
     private double startTime = System.currentTimeMillis();
     private double systemTime = System.currentTimeMillis();
 
+
     public GameView(Context context) {
         super(context);
         activity = (Main) context;
         paint = new Paint();
-        paint.setColor(Color.BLUE);
-        paint.setTextSize(100);
+        paint.setColor(Color.RED);
+        paint.setTextSize(30);
+
+
         highScore = activity.getHighScore();
         preferences = activity.getSharedPreferences("Options", Context.MODE_PRIVATE);
-        difficultyDecider = preferences.getFloat("Difficulty", .9f);
+        difficultyDecider = preferences.getFloat("Difficulty", .97f);
         gameLoopThread = new GameThread(this);
         holder = getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -94,7 +99,7 @@ public class GameView extends SurfaceView {
 
     private void createBackground() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.background);
-        Bitmap cloud = BitmapFactory.decodeResource(getResources(), R.drawable.newcloud);
+        Bitmap cloud = BitmapFactory.decodeResource(getResources(), R.drawable.clowd3);
         background = new Background(this, bg, cloud);
     }
 
@@ -121,26 +126,25 @@ public class GameView extends SurfaceView {
             peasant.add(createPeasant(R.drawable.test1));
             spritesAdded++;
         }
-
-        if((systemTime - startTime) / timeTracker > 1) {
-            //the longer they survive, the harder it gets
-            //the time tracker is determine the next time where the difficulty will increase
-            timeTracker = timeTracker * 1.3;
-            difficultyDecider = difficultyDecider - .01;
-        }
-        else if((systemTime - startTime) / timeTracker < 0) {
-            //if it is midnight and goes to 12:01 this would be negative
-            //so we need to add on the midnight time in millis
-            systemTime = systemTime + 86400000;
-            if((systemTime - startTime) % timeTracker > 1) {
+        if(spritesThatMadeIt <= 10) {
+            if ((systemTime - startTime) / timeTracker > 1) {
                 //the longer they survive, the harder it gets
                 //the time tracker is determine the next time where the difficulty will increase
                 timeTracker = timeTracker * 1.3;
                 difficultyDecider = difficultyDecider - .01;
+            } else if ((systemTime - startTime) / timeTracker < 0) {
+                //if it is midnight and goes to 12:01 this would be negative
+                //so we need to add on the midnight time in millis
+                systemTime = systemTime + 86400000;
+                if ((systemTime - startTime) % timeTracker > 1) {
+                    //the longer they survive, the harder it gets
+                    //the time tracker is determine the next time where the difficulty will increase
+                    timeTracker = timeTracker * 1.3;
+                    difficultyDecider = difficultyDecider - .01;
+                }
+
             }
-
         }
-
     }
 
     @Override
@@ -148,8 +152,17 @@ public class GameView extends SurfaceView {
         canvas.drawColor(Color.WHITE);
         background.onDraw(canvas);
         //healthBar.onDraw(canvas);
-        if (lightning.isVisible())
-            lightning.onDraw(canvas);
+        if (spritesThatMadeIt >= 10) {
+            Paint paint1 = new Paint();
+            paint1.setColor(Color.RED);
+            paint1.setTextSize(100);
+            canvas.drawText("GAME OVER", this.getWidth()/2-250 ,this.getHeight()/2 , paint1);
+
+        }
+        else {
+            if (lightning.isVisible())
+                lightning.onDraw(canvas);
+        }
         currentScore = activity.getCurrentScore();
         highScore = activity.getHighScore();
         synchronized (getHolder()) {
@@ -157,9 +170,10 @@ public class GameView extends SurfaceView {
             Iterator<Peasant> it = peasants.iterator();
             while (it.hasNext()) {
                 Peasant peasant = it.next();
-                if (peasant.getX() == 0) {
+                if (peasant.getX() <= 0) {
                     //if peasant is off screen then don't render anymore
                     spritesDeleted++;
+                    spritesThatMadeIt++;
                     //if (healthBar.takeHit() == false) {
                     //    activity.saveScore();
                     //    activity.finish();
@@ -174,30 +188,34 @@ public class GameView extends SurfaceView {
                 }
             }
         }
-        canvas.drawText(String.valueOf(currentScore)+" High Score: "+String.valueOf(highScore), 25, 90, paint);
+        canvas.drawText("Current Score:" + String.valueOf(currentScore), 25, 30, paint);
+        canvas.drawText("High Score:"+String.valueOf(highScore), this.getWidth()-275, 30, paint);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (System.currentTimeMillis() - lastClick > 100) {
-            lastClick = System.currentTimeMillis();
-            synchronized (getHolder()) {
-                if (event.getX() > 1800)
-                    activity.saveScore();
-                if (event.getY() < 300) {
-                    lightning.setX(event.getX() - 45);
-                    lightning.setVisible(250, activity);
-                }
-                Iterator<Peasant> it = peasants.iterator();
-                while (it.hasNext()) {
-                    Peasant peasant = it.next();
-                    if (peasant.isCollition(event.getX(), event.getY())) {
-                        activity.increaseScore();
-                        spritesDeleted++;
-                        it.remove();
-                        peasant.bmp.recycle();
-                        peasant.bmp = null;
-                        peasant = null;
+        if(spritesThatMadeIt <= 10) {
+            if (System.currentTimeMillis() - lastClick > 500) {
+                lastClick = System.currentTimeMillis();
+                synchronized (getHolder()) {
+                    if (event.getX() > 1800)
+                        activity.saveScore();
+                    if (event.getY() < (this.getHeight() * 0.25)) {
+                        lightning.setX(event.getX() - 45);
+                        lightning.setVisible(150, activity);
+                    }
+                    Iterator<Peasant> it = peasants.iterator();
+                    while (it.hasNext()) {
+                        Peasant peasant = it.next();
+                        if (peasant.isCollition(event.getX(), event.getY())) {
+                            activity.increaseScore();
+                            spritesDeleted++;
+                            it.remove();
+                            peasant.bmp.recycle();
+                            peasant.bmp = null;
+                            peasant = null;
+                            break;
+                        }
                     }
                 }
             }

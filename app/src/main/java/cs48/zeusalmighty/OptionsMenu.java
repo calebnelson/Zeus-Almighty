@@ -32,7 +32,7 @@ public class OptionsMenu extends Activity {
         easy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeDifficulty(.9f);
+                changeDifficulty(.97f);
                 player.seekTo(0);
                 player.start();
             }
@@ -40,7 +40,7 @@ public class OptionsMenu extends Activity {
         medium.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeDifficulty(.75f);
+                changeDifficulty(.94f);
                 player.seekTo(0);
                 player.start();
             }
@@ -48,7 +48,7 @@ public class OptionsMenu extends Activity {
         hard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeDifficulty(.6f);
+                changeDifficulty(.91f);
                 player.seekTo(0);
                 player.start();
             }

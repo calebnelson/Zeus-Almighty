@@ -19,8 +19,8 @@ public class Background {
 
     public Background(GameView gameView, Bitmap bg, Bitmap cloud) {
         this.gameView = gameView;
-        this.bg = getResizedBitmap(bg, 1080, 1920);
-        this.cloud = getResizedBitmap(cloud, 300, 1880);
+        this.bg = getResizedBg(bg, gameView.getHeight(), gameView.getWidth());
+        this.cloud = getResizedCloud(cloud, gameView.getHeight(), gameView.getWidth());
     }
 
     public void onDraw(Canvas canvas) {
@@ -28,7 +28,7 @@ public class Background {
         Rect dst = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
         canvas.drawBitmap(bg, src, dst, null);
         Rect src2 = new Rect(0, 0, cloud.getWidth(), cloud.getHeight());
-        Rect dst2 = new Rect(20, 10, cloud.getWidth() + 20, cloud.getHeight() + 10);
+        Rect dst2 = new Rect(0, 0, cloud.getWidth(), cloud.getHeight());
         canvas.drawBitmap(cloud, src2, dst2, null);
     }
 
@@ -41,6 +41,28 @@ public class Background {
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
 
+        return resizedBitmap;
+    }
+    public Bitmap getResizedBg(Bitmap bm, int viewheight, int viewwidth) {
+
+
+
+
+
+
+
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap (bm, viewwidth, viewheight, false);
+        return resizedBitmap;
+    }
+    public Bitmap getResizedCloud(Bitmap bm, int viewheight, int viewwidth) {
+
+        int height = (int)(viewheight*.25);
+
+
+
+
+
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap (bm, viewwidth, height, false);
         return resizedBitmap;
     }
 

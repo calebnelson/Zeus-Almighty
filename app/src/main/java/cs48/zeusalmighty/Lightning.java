@@ -26,9 +26,9 @@ public class Lightning {
 
     public Lightning(GameView gameView, Bitmap bmp) {
         this.gameView = gameView;
-        this.bmp = getResizedBitmap(bmp, 680, 90);
+        this.bmp = getResizedBitmap(bmp, gameView.getHeight(), bmp.getWidth());
         x = 0;
-        y = 300;
+        y = (int)(gameView.getHeight()*0.25);
     }
 
     public boolean isVisible() {
@@ -37,15 +37,19 @@ public class Lightning {
 
     public void setVisible(int duration, Main main) {
         visible = true;
-        player = MediaPlayer.create(main, R.raw.woosh);
+        player = MediaPlayer.create(main, R.raw.thunderclap);
         player.seekTo(0);
         player.start();
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run(){
                 visible = false;
+
             }
         }, duration);
+
+
+
     }
 
     public void setX(float x) {
@@ -56,17 +60,20 @@ public class Lightning {
         Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
         Rect dst = new Rect((int)x, (int)y, (int)x + bmp.getWidth(), (int)y + bmp.getHeight());
         canvas.drawBitmap(bmp, src, dst, null);
+
+        src = null;
+        dst = null;
     }
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+    public Bitmap getResizedBitmap(Bitmap bm, int viewheight, int bmpwidth) {
 
+        int height = (int)(viewheight*.65);
+
+
+
+
+
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap (bm, bmpwidth*2, height, false);
         return resizedBitmap;
     }
 
