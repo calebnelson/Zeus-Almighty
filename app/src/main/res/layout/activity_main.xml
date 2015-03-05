@@ -1,10 +1,10 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
     android:paddingBottom="16dp" tools:context=".Menu"
-    android:background="@drawable/zeus"
+    android:background="@drawable/mainscreen"
     android:id="@+id/Main">
 
     <Button
@@ -13,19 +13,19 @@
         android:text="Options"
         android:onClick="startOptions"
         android:id="@+id/button2"
-        android:background="#ff8298ff"/>
+    />
 
     <Button
-        android:layout_width="fill_parent"
-        android:layout_height="47dp"
-        android:text="PLAY"
+        android:layout_width="500dp"
+        android:layout_height="60dp"
+        android:text="Play"
         android:id="@+id/button"
         android:onClick="startGame"
-        android:layout_alignParentBottom="false"
-        android:layout_centerHorizontal="false"
-        android:background="#ff8298ff"
         android:layout_gravity="bottom"
         android:ellipsize="none"
-        android:textSize="30dp" />
+        android:textSize="30dp"
+        android:layout_marginBottom="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
-</LinearLayout>
+</RelativeLayout>

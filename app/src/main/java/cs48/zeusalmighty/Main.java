@@ -50,8 +50,6 @@ public class Main extends Activity {
 
     public void saveScore() {
         if (this.currentScore > this.highScore) {
-            this.high.seekTo(0);
-            this.high.start();
             this.highScore = this.currentScore;
             SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();

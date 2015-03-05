@@ -8,7 +8,7 @@ import android.graphics.Rect;
 import java.util.Random;
 
 
-public class Peasant {
+public class Knight {
     private static final int BMP_ROWS = 4;
     private static final int BMP_COLUMNS = 3;
     private static final int MAX_SPEED = 5;
@@ -16,14 +16,16 @@ public class Peasant {
     public Bitmap bmp;
     private int x = 0;
     private int y = 0;
-    private int xSpeed = 15;
+    private int xSpeed = 3;
     private int ySpeed;
     private int currentFrame = 0;
     private int width;
     private int height;
     public Rect dst;
+    public int hitsTaken = 0;
 
-    public Peasant(GameView gameView, Bitmap bmp) {
+
+    public Knight(GameView gameView, Bitmap bmp) {
         this.x = gameView.getWidth();
         this.y = (int)(gameView.getHeight()*0.9);
         this.gameView = gameView;
@@ -38,12 +40,14 @@ public class Peasant {
 
     private void update() {
         if (x > gameView.getWidth() - width - xSpeed) {
-            xSpeed = -15;
+            xSpeed = -3;
         }
 
         x = x + xSpeed;
         currentFrame = ++currentFrame % BMP_COLUMNS;
     }
+
+
 
     public void onDraw(Canvas canvas) {
         update();
@@ -74,3 +78,4 @@ public class Peasant {
         return x2 > (x - 25) && x2 < (x + 25 + width) && y2 < 300;
     }
 }
+

@@ -23,6 +23,8 @@ public class Lightning {
     private boolean visible;
     private float x, y;
     private MediaPlayer player;
+    int counter = 0;
+
 
     public Lightning(GameView gameView, Bitmap bmp) {
         this.gameView = gameView;
@@ -36,20 +38,33 @@ public class Lightning {
     }
 
     public void setVisible(int duration, Main main) {
+        if(counter == 0) {
+            player = MediaPlayer.create(main, R.raw.thunderclap);
+            counter++;
+        }
+
         visible = true;
-        player = MediaPlayer.create(main, R.raw.thunderclap);
-        player.seekTo(0);
-        player.start();
+        //if(!player.isPlaying()) {
+
+            player.seekTo(0);
+            player.start();
+       // }
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run(){
                 visible = false;
+
 
             }
         }, duration);
 
 
 
+
+
+    }
+    public int width() {
+        return bmp.getWidth();
     }
 
     public void setX(float x) {
@@ -67,13 +82,13 @@ public class Lightning {
 
     public Bitmap getResizedBitmap(Bitmap bm, int viewheight, int bmpwidth) {
 
-        int height = (int)(viewheight*.65);
+        int height = (int)(viewheight*.7);
 
 
 
 
 
-        Bitmap resizedBitmap = Bitmap.createScaledBitmap (bm, bmpwidth*2, height, false);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bm, bmpwidth * 2, height, false);
         return resizedBitmap;
     }
 
