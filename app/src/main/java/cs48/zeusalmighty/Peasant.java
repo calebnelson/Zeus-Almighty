@@ -2,7 +2,6 @@ package cs48.zeusalmighty;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 
 import java.util.Random;
@@ -11,13 +10,11 @@ import java.util.Random;
 public class Peasant {
     private static final int BMP_ROWS = 4;
     private static final int BMP_COLUMNS = 3;
-    private static final int MAX_SPEED = 5;
     private GameView gameView;
     public Bitmap bmp;
     private int x = 0;
     private int y = 0;
-    private int xSpeed = 15;
-    private int ySpeed;
+    private int xSpeed = 20;
     private int currentFrame = 0;
     private int width;
     private int height;
@@ -38,7 +35,7 @@ public class Peasant {
 
     private void update() {
         if (x > gameView.getWidth() - width - xSpeed) {
-            xSpeed = -15;
+            xSpeed = -18;
         }
 
         x = x + xSpeed;
@@ -58,19 +55,8 @@ public class Peasant {
         dst = null;
     }
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-
-        return resizedBitmap;
-    }
 
     public boolean isCollision(float x2, float y2) {
-        return x2 > (x - 25) && x2 < (x + 25 + width) && y2 < 300;
+        return x2 > (x-10 ) && x2 < (x +10 + width) && y2 < 300;
     }
 }

@@ -21,7 +21,6 @@ import java.util.TimerTask;
 
 
 public class GameView extends SurfaceView {
-    private Bitmap bmp;
     private SurfaceHolder holder;
     private GameThread gameLoopThread;
     private List<Peasant> peasants = new ArrayList<Peasant>();
@@ -32,32 +31,30 @@ public class GameView extends SurfaceView {
     private long lastClick;
     private Background background;
     private Main activity;
+    private GameViewControllerKnights knightscontroller;
+    private GameViewControllerPeasants peasantscontroller;
     private HealthBar healthBar;
     private Paint paint;
     private int highScore, currentScore;
-    private int spritesAdded = 0;
-    private int spritesDeleted = 0;
-    private int spritesThatMadeIt = 0;
-    private int positionCounter = 1000;
-    //the lower the number, the harder it is. must be between 0 and 1
     private SharedPreferences preferences;
     public double difficultyDecider;
-    private double timeTracker = 15000;
-    private int speed = 20;
+    public double timeTracker = 15000;
     private Bitmap boom;
     private Bitmap boom2;
-    private double startTime = System.currentTimeMillis();
-    private double systemTime = System.currentTimeMillis();
+    public double startTime = System.currentTimeMillis();
+    public double systemTime = System.currentTimeMillis();
     private int lightningChanger = 0;
-    private int xcood = 0;
     public Rect src;
     public Rect dst;
     public int chooseBoom1=0;
     public int chooseBoom2=0;
+    public int removed = 0;
 
     public GameView(Context context) {
         super(context);
         activity = (Main) context;
+        knightscontroller = new GameViewControllerKnights(this, activity);
+        peasantscontroller = new GameViewControllerPeasants(this, activity);
         paint = new Paint();
         paint.setColor(Color.RED);
         paint.setTextSize(30);
@@ -103,43 +100,34 @@ public class GameView extends SurfaceView {
             }
         });
 
-    }
-
-    private Peasant createPeasant(int bitmap) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        Bitmap assets = BitmapFactory.decodeResource(getResources(), bitmap);
-
-        assets = Bitmap.createScaledBitmap(assets, (int)(this.getHeight()*.20),(int)(this.getHeight()*.20),true);
-
-        return new Peasant(this,assets);
-    }
-    private Knight createKnight(int bitmap) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        Bitmap assets = BitmapFactory.decodeResource(getResources(), bitmap);
-
-        assets = Bitmap.createScaledBitmap(assets, (int)(this.getHeight()*.20),(int)(this.getHeight()*.20),true);
-
-        return new Knight(this,assets);
-    }
+    }//End of GameView Constructor
 
 
 
+
+
+    /*----------------------Create all the Images for Background and Effects-----------------------*/
+
+    //Create the background image with the cloud over it
     private void createBackground() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.background);
         Bitmap cloud = BitmapFactory.decodeResource(getResources(), R.drawable.clowd3);
         background = new Background(this, bg, cloud);
     }
 
+    //create multicolored explosion that replaces character when destroyed
     private void createBoom() {
         boom = BitmapFactory.decodeResource(getResources(), R.drawable.boom);
         boom = Bitmap.createScaledBitmap(boom, (int)(this.getHeight()*.2),(int)(this.getHeight()*.2),true);
     }
 
+    //create electric-shock looking explosion used on Knights only
     private void createBoom2() {
         boom2 = BitmapFactory.decodeResource(getResources(), R.drawable.boom2);
         boom2 = Bitmap.createScaledBitmap(boom2, (int)(this.getHeight()*.1),(int)(this.getHeight()*.1),true);
     }
 
+    //>>>>>>There are 3 types of lightning that all must be declared to create illusion<<<<<<<<<<<
     private void createLightning() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.lightning1);
         lightning = new Lightning(this, bg);
@@ -152,61 +140,20 @@ public class GameView extends SurfaceView {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.lightning3);
         lightning3 = new Lightning(this, bg);
     }
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>End of Lightning declarations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+    //Create Health bar on top of screen
     private void createHealthBar() {
-        Bitmap hb = BitmapFactory.decodeResource(getResources(), R.drawable.healthbar);
-        healthBar = new HealthBar(this, hb);
+        healthBar = new HealthBar(this);
     }
 
-    public void addPeasant(List<Peasant> peasant) {
-        Random random = new Random();
-        float temp = random.nextFloat();
-        systemTime = System.currentTimeMillis();
-        if(peasant.isEmpty()) {
-            peasant.add(createPeasant(R.drawable.test1));
-            spritesAdded++;
-        }
+    /*-----------------------End of Background and Effects Declarations------------------------*/
 
-        else if(temp > difficultyDecider) {
-            peasant.add(createPeasant(R.drawable.test1));
-            spritesAdded++;
-        }
-        if(healthBar.currentHealth > 0 ) {
-            if ((systemTime - startTime) / timeTracker > 1) {
-                //the longer they survive, the harder it gets
-                //the time tracker is determine the next time where the difficulty will increase
-                timeTracker = timeTracker * 1.2;
-                difficultyDecider = difficultyDecider - .01;
-            } else if ((systemTime - startTime) / timeTracker < 0) {
-                //if it is midnight and goes to 12:01 this would be negative
-                //so we need to add on the midnight time in millis
-                systemTime = systemTime + 86400000;
-                if ((systemTime - startTime) % timeTracker > 1) {
-                    //the longer they survive, the harder it gets
-                    //the time tracker is determine the next time where the difficulty will increase
-                    timeTracker = timeTracker * 1.2;
-                    difficultyDecider = difficultyDecider - .01;
-                }
 
-            }
-        }
-    }
 
-    public void addKnight(List<Knight> knight) {
-        Random random = new Random();
-        float temp = random.nextFloat();
-        systemTime = System.currentTimeMillis();
-        /*if(knight.isEmpty()) {
-            knight.add(createPeasant(R.drawable.test1));
-            spritesAdded++;
-        }*/
 
-        if(temp > (difficultyDecider)+0.04) {
-            knight.add(createKnight(R.drawable.test2));
-            spritesAdded++;
-        }
 
-    }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -256,45 +203,12 @@ public class GameView extends SurfaceView {
         currentScore = activity.getCurrentScore();
         highScore = activity.getHighScore();
         synchronized (getHolder()) {
-            addPeasant(peasants);
-            addKnight(knights);
-            Iterator<Peasant> it = peasants.iterator();
-            while (it.hasNext()) {
-                Peasant peasant = it.next();
-                if (peasant.getX() <= 0) {
-                    //if peasant is off screen then don't render anymore
-                    spritesDeleted++;
-                    spritesThatMadeIt++;
-                    healthBar.takeHit();
-                    it.remove();
-                    peasant.bmp.recycle();
-                    peasant.bmp = null;
-                    peasant = null;
-                    //break;
-                } else if (peasant.getX() > 0) {
-                    peasant.onDraw(canvas);
-                }
-            }
-            Iterator<Knight> it1 = knights.iterator();
-            while (it1.hasNext()) {
-                Knight knight = it1.next();
-                if (knight.getX() <= 0) {
-                    //if peasant is off screen then don't render anymore
-                    spritesDeleted++;
-                    spritesThatMadeIt++;
-                    healthBar.takeHit();
-                    healthBar.takeHit();
-                    it1.remove();
-                    knight.bmp.recycle();
-                    knight.bmp = null;
-                    knight = null;
-                    //break;
-                } else if (knight.getX() > 0) {
-                    if(knight.bmp != null) {
-                        knight.onDraw(canvas);
-                    }
-                }
-            }
+
+            peasantscontroller.addPeasant(peasants, healthBar);
+            knightscontroller.addKnight(knights);
+            peasantscontroller.drawPeasant(peasants, healthBar, canvas);
+            knightscontroller.drawKnight(knights, healthBar, canvas);
+
         }
         canvas.drawText("Current Health", this.getWidth()/2 - 85 , 30, paint);
         canvas.drawText("Current Score:" + String.valueOf(currentScore), 25, 50, paint);
@@ -305,13 +219,11 @@ public class GameView extends SurfaceView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int removed = 0;
+        removed = 0;
         if(healthBar.currentHealth > 0.0) {
-            if (System.currentTimeMillis() - lastClick > 500) {
+            if (System.currentTimeMillis() - lastClick > 300) {
                 lastClick = System.currentTimeMillis();
                 synchronized (getHolder()) {
-                    if (event.getX() > 1800)
-                        activity.saveScore();
                     if (event.getY() < (this.getHeight() * 0.25)) {
                         lightning.setX(event.getX()-(lightning.width())/2);
                         lightning.setVisible(150, activity);
@@ -321,65 +233,8 @@ public class GameView extends SurfaceView {
                         lightning3.setVisible(150, activity);
 
 
-
-                        Iterator<Knight> it1 = knights.iterator();
-                        while (it1.hasNext()) {
-                            Knight knight = it1.next();
-                            if (knight.isCollision(event.getX(), event.getY())) {
-                                if(knight.hitsTaken < 5 && removed == 0) {
-                                    knight.hitsTaken += 1;
-                                    int xcoord = knight.getX();
-                                    dst = new Rect(xcoord-(int)(boom2.getWidth())/3, (int)(this.getHeight()*0.87), xcoord + boom2.getWidth()-(int)(boom2.getWidth())/3, (int)(this.getHeight()*0.87)+ boom2.getHeight());
-                                    src = new Rect(0, 0, boom2.getWidth(), (int)(boom2.getHeight()));
-                                    chooseBoom1 = 1;
-                                    removed = 1;
-                                }
-                                else if(knight.hitsTaken >= 5) {
-                                    if(removed == 0 && chooseBoom1 == 0) {
-
-                                        int xcoord = knight.getX();
-
-                                        dst = new Rect(xcoord - (int) (boom.getWidth() / 2), (int) (this.getHeight() * 0.85), xcoord + boom.getWidth() - (int) (boom.getWidth() / 2), (int) (this.getHeight() * 0.85) + boom.getHeight());
-                                        src = new Rect(0, (int) (boom.getHeight() * .3), boom.getWidth(), (int) (boom.getHeight() * .7));
-
-                                        activity.increaseScore();
-                                        spritesDeleted++;
-                                        it1.remove();
-
-
-                                        knight.bmp.recycle();
-                                        knight.bmp = null;
-                                        knight = null;
-                                        chooseBoom2 = 1;
-                                        break;
-                                    }
-                                    removed = 1;
-                                }
-                            }
-                        }
-                    Iterator<Peasant> it = peasants.iterator();
-                    while (it.hasNext()) {
-                        Peasant peasant = it.next();
-                        if (peasant.isCollision(event.getX(), event.getY())) {
-                            if(removed == 0) {
-                                int xcoord = peasant.getX();
-
-                                dst = new Rect(xcoord - (int) (boom.getWidth() / 2), (int) (this.getHeight() * 0.85), xcoord + boom.getWidth() - (int) (boom.getWidth() / 2), (int) (this.getHeight() * 0.85) + boom.getHeight());
-                                src = new Rect(0, (int) (boom.getHeight() * .3), boom.getWidth(), (int) (boom.getHeight() * .7));
-
-                                activity.increaseScore();
-                                spritesDeleted++;
-                                it.remove();
-                                peasant.bmp.recycle();
-                                peasant.bmp = null;
-                                peasant = null;
-
-                                chooseBoom2 = 1;
-                                break;
-                            }
-                            removed = 1;
-                        }
-                    }
+                        knightscontroller.knightHit(knights, event.getX(), event.getY(), boom, boom2);
+                        peasantscontroller.peasantHit(peasants, event.getX(), event.getY(), boom);
 
                     }
                 }

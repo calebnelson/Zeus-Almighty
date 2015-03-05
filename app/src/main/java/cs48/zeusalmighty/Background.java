@@ -32,36 +32,13 @@ public class Background {
         canvas.drawBitmap(cloud, src2, dst2, null);
     }
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-
-        return resizedBitmap;
-    }
     public Bitmap getResizedBg(Bitmap bm, int viewheight, int viewwidth) {
-
-
-
-
-
-
-
         Bitmap resizedBitmap = Bitmap.createScaledBitmap (bm, viewwidth, viewheight, false);
         return resizedBitmap;
     }
+
     public Bitmap getResizedCloud(Bitmap bm, int viewheight, int viewwidth) {
-
         int height = (int)(viewheight*.25);
-
-
-
-
-
         Bitmap resizedBitmap = Bitmap.createScaledBitmap (bm, viewwidth, height, false);
         return resizedBitmap;
     }

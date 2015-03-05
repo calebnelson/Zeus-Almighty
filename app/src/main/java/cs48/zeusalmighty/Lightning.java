@@ -44,11 +44,11 @@ public class Lightning {
         }
 
         visible = true;
-        //if(!player.isPlaying()) {
 
-            player.seekTo(0);
-            player.start();
-       // }
+
+        player.seekTo(0);
+        player.start();
+
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run(){
@@ -76,8 +76,6 @@ public class Lightning {
         Rect dst = new Rect((int)x, (int)y, (int)x + bmp.getWidth(), (int)y + bmp.getHeight());
         canvas.drawBitmap(bmp, src, dst, null);
 
-        src = null;
-        dst = null;
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int viewheight, int bmpwidth) {
