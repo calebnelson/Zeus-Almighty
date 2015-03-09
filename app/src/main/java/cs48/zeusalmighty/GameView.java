@@ -1,26 +1,21 @@
 package cs48.zeusalmighty;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.content.*;
+import android.graphics.*;
+import android.view.*;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
+/**
+ * GameView is the class that implements the bulk of the game's mechanics. This class keeps track of all the 
+ * enemies currently in the game in addition to determining when the player has successfully hit an enemy 
+ * with lightning. Additionally, GameView keeps track of hits to a player's health bar and updates it accordingly.
+ * @author Group 9
+ */
 
 public class GameView extends SurfaceView {
+
+    // Instance variables. This is where the game's enemies are stored, along with the player's health bar object, 
+    // their score and difficulty settings, and the classes needed to display lightning bolts and other effects. 
     private SurfaceHolder holder;
     private GameThread gameLoopThread;
     private List<Peasant> peasants = new ArrayList<Peasant>();
@@ -50,6 +45,12 @@ public class GameView extends SurfaceView {
     public int chooseBoom2=0;
     public int removed = 0;
 
+    /**
+     * Constructor for GameView objects. Initializes controllers for enemy knights and peasants, attempts to
+     * load high score and difficulty settings, and defines behavior for when the gameview surface is initialized
+     * and destroyed.
+     * @param context       the Main object that is initialized when the game starts
+     */
     public GameView(Context context) {
         super(context);
         activity = (Main) context;
@@ -68,6 +69,9 @@ public class GameView extends SurfaceView {
         holder.addCallback(new SurfaceHolder.Callback() {
 
             @Override
+            /**
+             * behavior for when "back" button is pressed or when game is forcefully closed
+            */
             public void surfaceDestroyed(SurfaceHolder holder) {
                 boolean retry = true;
                 gameLoopThread.setRunning(false);
@@ -81,6 +85,9 @@ public class GameView extends SurfaceView {
             }
 
             @Override
+            /**
+             * behavior for when gameview is initialized
+             */
             public void surfaceCreated(SurfaceHolder holder) {
                 createBackground();
                 createBoom();
@@ -107,42 +114,57 @@ public class GameView extends SurfaceView {
 
 
     /*----------------------Create all the Images for Background and Effects-----------------------*/
-
-    //Create the background image with the cloud over it
+    /**
+     * Create the background image with the cloud over it
+     */
     private void createBackground() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.background);
         Bitmap cloud = BitmapFactory.decodeResource(getResources(), R.drawable.clowd3);
         background = new Background(this, bg, cloud);
     }
-
-    //create multicolored explosion that replaces character when destroyed
+    
+    /**
+     * create multicolored explosion that replaces character when destroyed
+     */
     private void createBoom() {
         boom = BitmapFactory.decodeResource(getResources(), R.drawable.boom);
         boom = Bitmap.createScaledBitmap(boom, (int)(this.getHeight()*.2),(int)(this.getHeight()*.2),true);
     }
 
-    //create electric-shock looking explosion used on Knights only
+    /**
+     * create electric-shock looking explosion used on Knights only
+     */
     private void createBoom2() {
         boom2 = BitmapFactory.decodeResource(getResources(), R.drawable.boom2);
         boom2 = Bitmap.createScaledBitmap(boom2, (int)(this.getHeight()*.1),(int)(this.getHeight()*.1),true);
     }
 
     //>>>>>>There are 3 types of lightning that all must be declared to create illusion<<<<<<<<<<<
+    /**
+     * creates first kind of lightning
+     */
     private void createLightning() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.lightning1);
         lightning = new Lightning(this, bg);
     }
+    /**
+     * creates second kind of lightning
+     */
     private void createLightning2() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.lightning2);
         lightning2 = new Lightning(this, bg);
     }
+    /**
+     * creates third kind of lightning
+     */
     private void createLightning3() {
         Bitmap bg = BitmapFactory.decodeResource(getResources(), R.drawable.lightning3);
         lightning3 = new Lightning(this, bg);
     }
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>End of Lightning declarations<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    //Create Health bar on top of screen
+    /**
+     * Create Health bar on top of screen
+     */
     private void createHealthBar() {
         healthBar = new HealthBar(this);
     }
@@ -156,6 +178,13 @@ public class GameView extends SurfaceView {
 
 
     @Override
+    /**
+     * onDraw method to draw the game's graphics. Draws the background, health bar, and score information. Also calls 
+     * methods that will potentially add a knight or peasant to the game, depending on the difficulty and player's luck.
+     * Calls draw method for enemies currently in the game and displays a large red "Game Over" message if a player's
+     * health bar runs out.
+     * @param canvas        the canvas the game will be drawn on
+     */
     protected void onDraw(Canvas canvas) {
 
         canvas.drawColor(Color.WHITE);
@@ -214,10 +243,15 @@ public class GameView extends SurfaceView {
         canvas.drawText("Current Score:" + String.valueOf(currentScore), 25, 50, paint);
         canvas.drawText("High Score:"+String.valueOf(highScore), this.getWidth()-275, 50, paint);
         dst = null;
-        src=null;
+        src = null;
     }
 
     @Override
+    /**
+     * Code to handle the event of a player touching the screen. This method determines where the user touched
+     * and, based on that location, determines if it is appropriate to display lightning and remove an enemy
+     * @param event     motion event corrensponding to the user touching the screen
+     */
     public boolean onTouchEvent(MotionEvent event) {
         removed = 0;
         if(healthBar.currentHealth > 0.0) {
