@@ -1,43 +1,39 @@
 package cs48.zeusalmighty;
 
+import android.content.*;
+import android.graphics.*;
+import android.view.*;
+import java.util.*;
+
 /**
- * Created by Po on 3/5/15.
+ * Controller class for the knight enemies present in the game. Knights are a beefed-up version of peasants and thus
+ * are able to take more hits before dying. This class is responsible for drawing, creating, and
+ * destroying knight enemies during the course of gameplay.
+ * @author Group 9
  */
-
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 
 public class GameViewControllerKnights {
 
+    // instance variables
     private Main activity;
     public Rect src;
     public Rect dst;
     private GameView gameView;
 
-
+    /**
+    * Default constructor
+    * @param gameView       GameView object currently running game
+    * @param activity       Main activity running game
+    */
     public GameViewControllerKnights(GameView gameView, Main activity) {
         this.activity = activity;
         this.gameView = gameView;
     }
-
-
-
+    
+    /**
+    * Creates a knight enemy from a given bitmap to be added to the list of knights in the game
+    * @param bitmap         bitmap used to draw peasant enemy
+    */
     public Knight createKnight(int bitmap) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         Bitmap assets = BitmapFactory.decodeResource(gameView.getResources(), bitmap);
@@ -47,6 +43,10 @@ public class GameViewControllerKnights {
         return new Knight(gameView,assets);
     }
 
+    /**
+    * Adds a new knight enemy to the list of knights in the GameView.
+    * @param knight        arrayList of peasant to be added to 
+    */
     public void addKnight(List<Knight> knight) {
         Random random = new Random();
         float temp = random.nextFloat();
@@ -57,6 +57,14 @@ public class GameViewControllerKnights {
         }
 
     }
+    
+    /**
+    * method to call from onDraw method of GameView. iterates over the list of knights in the game and draws each one that 
+    * has not yet reached the edge of the screen
+    * @param knights        list of knights currently in the game
+    * @param healthBar      health bar object from game
+    * @param canvas         canvas to be drawn on
+    */
     public void drawKnight(List<Knight> knights, HealthBar healthBar, Canvas canvas) {
         Iterator<Knight> it1 = knights.iterator();
         while (it1.hasNext()) {
@@ -78,6 +86,14 @@ public class GameViewControllerKnights {
         }
     }
 
+    /**
+    * Method to determine if any knights were hit based on a given lightning bolt's location
+    * @param knights       list of knight enemies in the game currently
+    * @param x              x coordinate of lightning bolt
+    * @param y              y coordinate of lightning bolt
+    * @param boom           bitmap of explosion graphic to display after a hit
+    * @param boom2          bitmap of explosion graphic to display after a kill
+    */
     public void knightHit(List<Knight> knights, float x, float y, Bitmap boom, Bitmap boom2) {
 
         Iterator<Knight> it1 = knights.iterator();
@@ -101,7 +117,6 @@ public class GameViewControllerKnights {
 
                         activity.increaseScore();
                         it1.remove();
-
 
                         knight.bmp.recycle();
                         knight.bmp = null;
