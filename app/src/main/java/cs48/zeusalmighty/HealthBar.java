@@ -35,7 +35,6 @@ public class HealthBar {
         currentHealth = currentHealth - 0.1;
     }
 
-    @Override
     /**
      * onDraw method to draw health bar at the top of the screen
      * @param canvas            canvas to be drawn on
