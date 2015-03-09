@@ -85,7 +85,6 @@ public class Lightning {
         this.x = x;
     }
 
-    @Override
     /**
     * onDraw method to draw lightning bolt, will only be called by GameView if "visible" boolean is set to true
     * @param canvas         the canvas to be drawn on
