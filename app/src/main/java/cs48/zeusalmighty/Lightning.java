@@ -47,8 +47,9 @@ public class Lightning {
     * Sets the visible instance variable to "true" for a given duration. This makes the lightning bolt get drawn for 
     * the amount of milliseconds specified by duration parameter.
     * @param duration       time in milliseconds to display lightning bolt
+    * @param main           main activity running game
     */
-    public void setVisible(int duration) {
+    public void setVisible(int duration, Main main) {
         // only create mediaplayer if one hasn't been created yet
         if(counter == 0) {
             player = MediaPlayer.create(main, R.raw.thunderclap);
