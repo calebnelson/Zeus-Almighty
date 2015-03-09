@@ -10,9 +10,15 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
+/**
+ * OptionsMenu is a class to display a menu for the player to change the game's difficulty. These settings are stored in 
+ * a preferences file whenever a difficulty button is pressed.
+ * @author Group 9
+ */
 
 public class OptionsMenu extends Activity {
 
+    // instance variables
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private MediaPlayer player;
@@ -21,6 +27,10 @@ public class OptionsMenu extends Activity {
     private Button hard;
 
     @Override
+    /**
+    * Creates 3 difficulty buttons which will update the game's difficulty variable to a correspoding value by 
+    * implementing onclicklisteners for each button that will call the helper method changeDifficulty
+    */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -55,6 +65,10 @@ public class OptionsMenu extends Activity {
         });
     }
 
+    /**
+    * Helper method called when a button is pressed; changes difficulty based on which button was pressed
+    * @param diff       float value of difficulty used by code to determine frequency of new enemy creation
+    */
     public void changeDifficulty(float diff) {
         preferences = getSharedPreferences("Options", Context.MODE_PRIVATE);
         editor = preferences.edit();
