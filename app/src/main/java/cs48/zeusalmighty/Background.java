@@ -30,8 +30,8 @@ public class Background {
         this.cloud = getResizedCloud(cloud, gameView.getHeight(), gameView.getWidth());
     }
 
+    @Override
     /**
-     * @override
      * onDraw method to draw the background and cloud images resized properly to the screen size
      * @param canvas        the canvas to be drawn on
      */
