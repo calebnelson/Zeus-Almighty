@@ -1,14 +1,17 @@
 package cs48.zeusalmighty;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-
+import android.graphics.*;
 import java.util.Random;
 
+/**
+ * Knight is a class to implement an "elite" enemy, or one that is stronger than the typical peasant enemies.
+ * Knights are able to take more hits than peasants, but do not get generated as often.
+ * @author Group 9 
+ */
 
 public class Knight {
+    
+    // instance variables
     private static final int BMP_ROWS = 4;
     private static final int BMP_COLUMNS = 3;
     private GameView gameView;
@@ -22,7 +25,11 @@ public class Knight {
     public Rect dst;
     public int hitsTaken = 0;
 
-
+    /**
+    * Constructor: gets width and height of sprites based on size of sprite sheet.
+    * @param gameView       GameView object knights will be present in
+    * @param bmp            bitmap of sprite sheet to use for knights
+    */
     public Knight(GameView gameView, Bitmap bmp) {
         this.x = gameView.getWidth();
         this.y = (int)(gameView.getHeight()*0.9);
@@ -32,10 +39,16 @@ public class Knight {
         this.height = bmp.getHeight() / BMP_ROWS;
     }
 
+    /**
+    * Return x coordinate of knight enemy
+    */
     public int getX() {
         return this.x;
     }
 
+    /**
+    * Called each time onDraw is called to update the x coordinate of the knight
+    */
     private void update() {
         if (x > gameView.getWidth() - width - xSpeed) {
             xSpeed = -5;
@@ -45,8 +58,11 @@ public class Knight {
         currentFrame = ++currentFrame % BMP_COLUMNS;
     }
 
-
-
+    /**
+    * onDraw method that selects appropriate region of sprite sheet to draw and draws it on the canvas based on 
+    * the knight's x coordinate instance variable
+    * @param canvas         the canvas to be drawn on
+    */
     public void onDraw(Canvas canvas) {
         update();
         int srcX = currentFrame * width;
@@ -60,13 +76,14 @@ public class Knight {
         dst = null;
     }
 
-
-
+    /**
+    * Method to determine whether a lightning bolt at a given x,y location results in hitting a knight
+    * @param x2         x coordinate of lightning bolt
+    * @param y2         y coordinate of lightning bolt
+    */
     public boolean isCollision(float x2, float y2) {
         return x2 > (x-10) && x2 < (x + width+10) && y2 < 300;
     }
-
-
 
 }
 
